@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download YouTube Video</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #004736,#024b55);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0; /* Ensure no default margins */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+            font-size: 30px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 100px; /* Adjust padding for better look */
+            border-radius: 30px;
+            width: 90%; /* Set a width */
+            max-width: 600px; /* Ensure it doesn't get too wide */
+            margin: 0 auto; /* Center horizontally */
+        }
+        input, button {
+            padding: 15px;
+            margin: 15px 0; /* Only vertical margin */
+            border: none;
+            border-radius: 15px;
+            font-size: 20px; /* Increase font size */
+            box-sizing: border-box; /* Ensure padding is included in width calculation */
+        }
+        input[type="text"] {
+            text-align: center;
+            border-radius: 55px;
+            height: 80px; /* Adjust height */
+            line-height: 40px; /* Adjust line-height */
+            width: 100%; /* Extend the input width to full width */
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .progress-container {
+            margin: 20px 0;
+            background-color: #f3f3f3;
+            border-radius: 25px;
+        }
+        .progress-bar {
+            height: 50px;
+            width: 0%;
+            background-color: #4CAF50;
+            border-radius: 25px;
+            text-align: center;
+            line-height: 50px;
+            color: white;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #FFD700;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #ddd;
+            
+
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Download YouTube Video</h1>
+        <form id="download-form" action="/download" method="post">
+            <input type="text" name="download_path" placeholder="Enter Download Path" required><br>
+            <input type="text" name="video_url" placeholder="Enter Video URL" required><br>
+            <button type="submit">Download</button>
+        </form>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar">0%</div>
+        </div>
+        <div id="status"></div>
+        <div class="loading" id="loading">Downloading...</div>
+        <footer>
+            Copyright © 2024 All Rights Reserved Essam pro
+        </footer>
+    </div>
+   
+
+    <script>
+        const form = document.getElementById('download-form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const progressBar = document.getElementById('progress-bar');
+            const status = document.getElementById('status');
+            const loading = document.getElementById('loading');
+            progressBar.style.width = '0%';
+            progressBar.innerText = '0%';
+            status.innerText = '';
+            loading.style.display = 'block';
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/download', true);
+            xhr.responseType = 'json';
+            xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    progressBar.style.width = percentComplete + '%';
+                    progressBar.innerText = Math.round(percentComplete) + '%';
+                }
+            });
+
+            xhr.onload = function() {
+                loading.style.display = 'none';
+                if (xhr.status === 200) {
+                    const response = xhr.response;
+                    status.innerText = response.status;
+                } else {
+                    status.innerText = 'Download Failed';
+                }
+            };
+
+            const formData = new FormData(form);
+            const data = {
+                download_path: formData.get('download_path'),
+                video_url: formData.get('video_url')
+            };
+            xhr.send(JSON.stringify(data));
+        });
+    </script>
+</body>
+</html>
+
