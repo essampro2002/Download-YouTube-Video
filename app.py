@@ -14,7 +14,7 @@ def download_video(video_url, download_path, progress_callback=None):
         os.makedirs(download_path)
 
     ydl_opts = {
-        'format': 'best[height<=360]',
+        'format': 'bestvideo[height<=360]+bestaudio/best[height<=360]',
         'outtmpl': os.path.join(download_path, '%(title)s.%(ext)s'),
         'progress_hooks': [progress_callback] if progress_callback else [],
         'nocheckcertificate': True,
